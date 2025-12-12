@@ -1,0 +1,764 @@
+<!DOCTYPE html>  
+<html>	
+<head>	
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>【中文DJ】热歌榜1</title>	
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #fff;
+        line-height: 1.6;
+        padding: 10px;
+        min-height: 100vh;
+    }
+    
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 10px;
+    }
+    
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+        color: #4cc9f0;
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    
+    .version {
+        font-size: 0.9rem;
+        color: #aaa;
+        margin-bottom: 15px;
+    }
+    
+    .links {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .links a {
+        color: #72efdd;
+        text-decoration: none;
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s;
+    }
+    
+    .links a:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .player-section {
+        background: rgba(30, 30, 46, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .current-song {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        padding: 15px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        border-left: 4px solid #4cc9f0;
+        word-break: break-word;
+    }
+    
+    .player-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .progress-container {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    
+    .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+    
+    .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #4361ee, #4cc9f0);
+        width: 0%;
+        transition: width 0.1s;
+    }
+    
+    .time-display {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #aaa;
+    }
+    
+    .control-buttons {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+    }
+    
+    .control-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 50%;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .play-btn {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+    }
+    
+    .play-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 7px 20px rgba(67, 97, 238, 0.6);
+    }
+    
+    .prev-btn, .next-btn {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .prev-btn:hover, .next-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .playlist-section {
+        background: rgba(30, 30, 46, 0.8);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .playlist-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .playlist-header h2 {
+        font-size: 1.4rem;
+        color: #4cc9f0;
+    }
+    
+    .song-count {
+        font-size: 0.9rem;
+        color: #aaa;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 5px 10px;
+        border-radius: 15px;
+    }
+    
+    .playlist-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    
+    .song-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .song-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .song-item.active {
+        background: rgba(76, 201, 240, 0.2);
+        border-left: 4px solid #4cc9f0;
+    }
+    
+    .song-number {
+        width: 30px;
+        font-weight: bold;
+        color: #4cc9f0;
+    }
+    
+    .song-title {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.8rem;
+        color: #777;
+    }
+    
+    /* 滚动条样式 */
+    .playlist-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .playlist-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+    }
+    
+    .playlist-container::-webkit-scrollbar-thumb {
+        background: rgba(76, 201, 240, 0.5);
+        border-radius: 3px;
+    }
+    
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .player-section, .playlist-section {
+            padding: 15px;
+        }
+        
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+        
+        .song-item {
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .container {
+            padding: 5px;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+        }
+        
+        .links {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-buttons {
+            gap: 10px;
+        }
+        
+        .song-number {
+            width: 25px;
+        }
+    }
+    
+    /* 搜索框样式 */
+    .search-container {
+        margin-bottom: 15px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 25px;
+        border: none;
+        background: rgba(0, 0, 0, 0.3);
+        color: white;
+        font-size: 1rem;
+        outline: none;
+    }
+    
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .search-input:focus {
+        box-shadow: 0 0 0 2px #4cc9f0;
+    }
+</style>
+</head>	
+<body>	
+<div class="container">
+    <div class="header">
+        <h1>【中文DJ】热歌榜1</h1>
+        <div class="version">版本 2.1 | 完整歌曲库 (共 249 首歌曲)</div>
+        <div class="links">
+            <a href="http://www.beautifullover.org" target="_blank">beautifullover</a>
+            <a href="https://github.com/littleflute/BlCDs/issues/519" target="_blank">issue519</a>
+        </div>
+    </div>
+    
+    <div class="player-section">
+        <div id="curSong" class="current-song">准备播放...</div>
+        
+        <div class="player-controls">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="time-display">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalTime">0:00</span>
+                </div>
+            </div>
+            
+            <div class="control-buttons">
+                <button class="control-btn prev-btn" id="prevBtn">⏮</button>
+                <button class="control-btn play-btn" id="playBtn">▶</button>
+                <button class="control-btn next-btn" id="nextBtn">⏭</button>
+            </div>
+        </div>
+        
+        <audio id="mp3Player" preload="metadata">
+            <source src="01 Owner of a Lonely Heart.mp3" type="audio/mpeg">
+            您的浏览器不支持 audio 元素
+        </audio>
+    </div>
+    
+    <div class="playlist-section">
+        <div class="playlist-header">
+            <h2>歌曲列表</h2>
+            <div class="song-count">共 <span id="songCount">0</span> 首歌曲</div>
+        </div>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="搜索歌曲..." autocomplete="off">
+        </div>
+        
+        <div class="playlist-container" id="playlist">
+            <!-- 歌曲列表将通过JavaScript动态生成 -->
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2023 移动端音乐播放器 | 使用HTML5 Audio API构建</p>
+    </div>
+</div>
+
+<script>
+// 完整的歌曲数据（包含249首歌曲）
+const ALL_SONGS = [
+    { id: "1", title: "0501.王不醒 - 月老掉线 (DJ阿卓版).mp3", file: "0501.王不醒 - 月老掉线 (DJ阿卓版).mp3" },
+    { id: "2", title: "0502.楚可怜儿 - 梦里水乡 (DJ浪子康版).mp3", file: "0502.楚可怜儿 - 梦里水乡 (DJ浪子康版).mp3" },
+    { id: "3", title: "0503.邓岳章 - 情意结 (DJ R7版).mp3", file: "0503.邓岳章 - 情意结 (DJ R7版).mp3" },
+    { id: "4", title: "0504.南辰Music - 孤勇者 (DJ版).mp3", file: "0504.南辰Music - 孤勇者 (DJ版).mp3" },
+    { id: "5", title: "0505.小鬼阿秋 - 你爱我坏 (DJR7版).mp3", file: "0505.小鬼阿秋 - 你爱我坏 (DJR7版).mp3" },
+    { id: "6", title: "0506.邓岳章 - 飞花 (DJ阿卓版).mp3", file: "0506.邓岳章 - 飞花 (DJ阿卓版).mp3" },
+    { id: "7", title: "0507.DJ小鱼儿 - 她会魔法吧 (DJ R7版).mp3", file: "0507.DJ小鱼儿 - 她会魔法吧 (DJ R7版).mp3" },
+    { id: "8", title: "0508.常超凡 - 爱她宠她失去她 (DJ阿阳版).mp3", file: "0508.常超凡 - 爱她宠她失去她 (DJ阿阳版).mp3" },
+    { id: "9", title: "0509.杨青 - 就让我爱你 (DJ R7版).mp3", file: "0509.杨青 - 就让我爱你 (DJ R7版).mp3" },
+    { id: "10", title: "0510.付豪 - 也很值得 (DJ R7版).mp3", file: "0510.付豪 - 也很值得 (DJ R7版).mp3" },
+    { id: "11", title: "0511.莫叫姐姐 - 当我娶过她 (DJ R7版).mp3", file: "0511.莫叫姐姐 - 当我娶过她 (DJ R7版).mp3" },
+    { id: "12", title: "0512.汪六六 - 在他乡 (DJ R7版).mp3", file: "0512.汪六六 - 在他乡 (DJ R7版).mp3" },
+    { id: "13", title: "0513.张齐山DanieL - 幻星岛 (DJ阿卓版).mp3", file: "0513.张齐山DanieL - 幻星岛 (DJ阿卓版).mp3" },
+    { id: "14", title: "0514.海来阿木 - 五十年以后 (DJ R7版).mp3", file: "0514.海来阿木 - 五十年以后 (DJ R7版).mp3" },
+    { id: "15", title: "0515.鹏鹏、池立铎 - 英雄泪.mp3", file: "0515.鹏鹏、池立铎 - 英雄泪.mp3" },
+    { id: "16", title: "0516.何东亮、R7 - 回忆总想哭 (DJ R7版).mp3", file: "0516.何东亮、R7 - 回忆总想哭 (DJ R7版).mp3" },
+    { id: "17", title: "0517.明明有声 - 大雨还在下 (DJ R7版).mp3", file: "0517.明明有声 - 大雨还在下 (DJ R7版).mp3" },
+    { id: "18", title: "0518.鹏鹏、思佳 - 忘情果.mp3", file: "0518.鹏鹏、思佳 - 忘情果.mp3" },
+    { id: "19", title: "0519.R7[音乐人]-让我们荡起双桨(DJR7版).mp3", file: "0519.R7[音乐人]-让我们荡起双桨(DJR7版).mp3" },
+    { id: "20", title: "0520.爱何求(DJR7版) - 红孩儿.mp3", file: "0520.爱何求(DJR7版) - 红孩儿.mp3" },
+    { id: "21", title: "0521.不变的音乐_DJ打碟版.mp3", file: "0521.不变的音乐_DJ打碟版.mp3" },
+    { id: "22", title: "0522.大籽-白月光与朱砂痣(DJ小鱼儿版).mp3", file: "0522.大籽-白月光与朱砂痣(DJ小鱼儿版).mp3" },
+    { id: "23", title: "0523.海来阿木-点歌的人.mp3", file: "0523.海来阿木-点歌的人.mp3" },
+    { id: "24", title: "0524.海来阿木-来跳舞.mp3", file: "0524.海来阿木-来跳舞.mp3" },
+    { id: "25", title: "0525.秒针(Dj版) - 阿梨粤&R7.mp3", file: "0525.秒针(Dj版) - 阿梨粤&R7.mp3" },
+    { id: "26", title: "0526.神话情话_DJ打碟版.mp3", file: "0526.神话情话_DJ打碟版.mp3" },
+    { id: "27", title: "0527.五十年以后(DJR7版) - 海来阿木.mp3", file: "0527.五十年以后(DJR7版) - 海来阿木.mp3" },
+    { id: "28", title: "0528.一开始说陪你到老的人现在他还在吗(DJheap九天版) - 韩小欠.mp3", file: "0528.一开始说陪你到老的人现在他还在吗(DJheap九天版) - 韩小欠.mp3" },
+    { id: "29", title: "0529.一路生花(DJheap九天版) - 温奕心.mp3", file: "0529.一路生花(DJheap九天版) - 温奕心.mp3" },
+    { id: "30", title: "0530.原来占据你内心的人不是我 (DJ版) - 贺一航.mp3", file: "0530.原来占据你内心的人不是我 (DJ版) - 贺一航.mp3" },
+    { id: "31", title: "0531.郑亦辰 - 不舍 (DJ何鹏版).mp3", file: "0531.郑亦辰 - 不舍 (DJ何鹏版).mp3" },
+    { id: "32", title: "0532.谁 (DJ何鹏版) - 雪十郎.mp3", file: "0532.谁 (DJ何鹏版) - 雪十郎.mp3" },
+    { id: "33", title: "0533.想(DJ版) - 朱添泽.mp3", file: "0533.想(DJ版) - 朱添泽.mp3" },
+    { id: "34", title: "0534.曾(新版DJ名龙) - 孟维来.mp3", file: "0534.曾(新版DJ名龙) - 孟维来.mp3" },
+    { id: "35", title: "0535.DJ小鱼儿-一生回味一面.mp3", file: "0535.DJ小鱼儿-一生回味一面.mp3" },
+    { id: "36", title: "0536.DJ散人-凤凰展翅(DJ散人版).mp3", file: "0536.DJ散人-凤凰展翅(DJ散人版).mp3" },
+    { id: "37", title: "0537.IN-K_王忻辰-落差(DJ版).mp3", file: "0537.IN-K_王忻辰-落差(DJ版).mp3" },
+    { id: "38", title: "0538.IN-K_王忻辰-迷失幻境(DJ版).mp3", file: "0538.IN-K_王忻辰-迷失幻境(DJ版).mp3" },
+    { id: "39", title: "0539.阿YueYue-云与海(DJ沈念版).mp3", file: "0539.阿YueYue-云与海(DJ沈念版).mp3" },
+    { id: "40", title: "0540.零一九零贰-忘川彼岸(DJ名龙版).mp3", file: "0540.零一九零贰-忘川彼岸(DJ名龙版).mp3" },
+    { id: "41", title: "0541.差一步 (DJ承利版) - 承利.mp3", file: "0541.差一步 (DJ承利版) - 承利.mp3" },
+    { id: "42", title: "0542.每一步_DJ打碟版.mp3", file: "0542.每一步_DJ打碟版.mp3" },
+    { id: "43", title: "0543.这一生关于你的风景 (抖音DJ版) - 唐小力.mp3", file: "0543.这一生关于你的风景 (抖音DJ版) - 唐小力.mp3" },
+    { id: "44", title: "0544.是七叔呢-踏山河（DJ Yaha）.mp3", file: "0544.是七叔呢-踏山河（DJ Yaha）.mp3" },
+    { id: "45", title: "0545.是七叔呢_DJ黑桃A-燕无歇（DJ黑桃A）feat.是七叔呢.mp3", file: "0545.是七叔呢_DJ黑桃A-燕无歇（DJ黑桃A）feat.是七叔呢.mp3" },
+    { id: "46", title: "0546.可不可以 (DJ阿超版) - 张紫豪.mp3", file: "0546.可不可以 (DJ阿超版) - 张紫豪.mp3" },
+    { id: "47", title: "0547.可不可以_DJ打碟版.mp3", file: "0547.可不可以_DJ打碟版.mp3" },
+    { id: "48", title: "0548.言不由衷(DJheap九天版) - 小倩.mp3", file: "0548.言不由衷(DJheap九天版) - 小倩.mp3" },
+    { id: "49", title: "0549.前世_DJ打碟版.mp3", file: "0549.前世_DJ打碟版.mp3" },
+    { id: "50", title: "0550.广东爱情故事 (DJ伟伟版) - 广东雨神_伟伟.mp3", file: "0550.广东爱情故事 (DJ伟伟版) - 广东雨神_伟伟.mp3" },
+    { id: "51", title: "0551.广东爱情故事_DJ打碟版.mp3", file: "0551.广东爱情故事_DJ打碟版.mp3" },
+    { id: "52", title: "0552.一个人挺好 (DJ版) - 杨小壮.mp3", file: "0552.一个人挺好 (DJ版) - 杨小壮.mp3" },
+    { id: "53", title: "0553.一个多情又无情的人(沈念DJ版) - 花姐.mp3", file: "0553.一个多情又无情的人(沈念DJ版) - 花姐.mp3" },
+    { id: "54", title: "0554.那个女孩DJ (DJ版) - 张泽熙.mp3", file: "0554.那个女孩DJ (DJ版) - 张泽熙.mp3" },
+    { id: "55", title: "0555.那个女孩_DJ打碟版.mp3", file: "0555.那个女孩_DJ打碟版.mp3" },
+    { id: "56", title: "0556.风中的承诺_DJ打碟版.mp3", file: "0556.风中的承诺_DJ打碟版.mp3" },
+    { id: "57", title: "0557.霈丹(浪哥)-人生何处不相逢.mp3", file: "0557.霈丹(浪哥)-人生何处不相逢.mp3" },
+    { id: "58", title: "0558.人为情叹(DJ沈念版) - 阿悠悠.mp3", file: "0558.人为情叹(DJ沈念版) - 阿悠悠.mp3" },
+    { id: "59", title: "0559.我为爱情掉过几滴泪(DJ沈念版) - 杨小壮.mp3", file: "0559.我为爱情掉过几滴泪(DJ沈念版) - 杨小壮.mp3" },
+    { id: "60", title: "0560.怎么做怎么过怎么活 (DJ.House咚鼓版) - 黄静美.mp3", file: "0560.怎么做怎么过怎么活 (DJ.House咚鼓版) - 黄静美.mp3" },
+    { id: "61", title: "0561.夜之光 (DJ光音坊音乐版) - 花姐.mp3", file: "0561.夜之光 (DJ光音坊音乐版) - 花姐.mp3" },
+    { id: "62", title: "0562.逃之夭夭(DJheap九天版) - 张禾禾.mp3", file: "0562.逃之夭夭(DJheap九天版) - 张禾禾.mp3" },
+    { id: "63", title: "0563.小乐哥-执迷不悟(DJ版).mp3", file: "0563.小乐哥-执迷不悟(DJ版).mp3" },
+    { id: "64", title: "0564.再也等不到你(DJ阿卓版) - 陈舒岩.mp3", file: "0564.再也等不到你(DJ阿卓版) - 陈舒岩.mp3" },
+    { id: "65", title: "0565.入了我的心丢了我的魂(DJheap九天版) - 贺一航.mp3", file: "0565.入了我的心丢了我的魂(DJheap九天版) - 贺一航.mp3" },
+    { id: "66", title: "0566.来了老弟_DJ打碟版.mp3", file: "0566.来了老弟_DJ打碟版.mp3" },
+    { id: "67", title: "0567.故事与他_DJ打碟版.mp3", file: "0567.故事与他_DJ打碟版.mp3" },
+    { id: "68", title: "0568.陈亦洺-不及(DJ版).mp3", file: "0568.陈亦洺-不及(DJ版).mp3" },
+    { id: "69", title: "0569.闻人听書_-美人画卷.mp3", file: "0569.闻人听書_-美人画卷.mp3" },
+    { id: "70", title: "0570.凡人歌_DJ打碟版.mp3", file: "0570.凡人歌_DJ打碟版.mp3" },
+    { id: "71", title: "0571.男人歌_DJ打碟版.mp3", file: "0571.男人歌_DJ打碟版.mp3" },
+    { id: "72", title: "0572.离人殇_DJ打碟版.mp3", file: "0572.离人殇_DJ打碟版.mp3" },
+    { id: "73", title: "0573.小人物(DJ沈念版) - 乔艳艳.mp3", file: "0573.小人物(DJ沈念版) - 乔艳艳.mp3" },
+    { id: "74", title: "0574.男人花_DJ打碟版.mp3", file: "0574.男人花_DJ打碟版.mp3" },
+    { id: "75", title: "0575.不仅仅是喜欢 _DJ打碟版.mp3", file: "0575.不仅仅是喜欢 _DJ打碟版.mp3" },
+    { id: "76", title: "0576.耀仔-往事如烟(DJ版).mp3", file: "0576.耀仔-往事如烟(DJ版).mp3" },
+    { id: "77", title: "0577.谪仙 (DJ名龙版) - 伊格赛听、叶里.mp3", file: "0577.谪仙 (DJ名龙版) - 伊格赛听、叶里.mp3" },
+    { id: "78", title: "0578.神仙哥哥 - 黑街 (DJ咚鼓版).mp3", file: "0578.神仙哥哥 - 黑街 (DJ咚鼓版).mp3" },
+    { id: "79", title: "0579.我们不一样 (DJ小鱼儿版) - 大壮.mp3", file: "0579.我们不一样 (DJ小鱼儿版) - 大壮.mp3" },
+    { id: "80", title: "0580.你会遇见更好的人(DJ阳少Mix版) - 郭聪明.mp3", file: "0580.你会遇见更好的人(DJ阳少Mix版) - 郭聪明.mp3" },
+    { id: "81", title: "0581.海伦-游山恋.mp3", file: "0581.海伦-游山恋.mp3" },
+    { id: "82", title: "0582.梦伴_DJ打碟版.mp3", file: "0582.梦伴_DJ打碟版.mp3" },
+    { id: "83", title: "0583.赤伶 (DJ名龙版) - 等什么君.mp3", file: "0583.赤伶 (DJ名龙版) - 等什么君.mp3" },
+    { id: "84", title: "0584.给你们_DJ打碟版.mp3", file: "0584.给你们_DJ打碟版.mp3" },
+    { id: "85", title: "0585.陪你到底 (DJ光音坊音乐版) - 广东雨神_许华升.mp3", file: "0585.陪你到底 (DJ光音坊音乐版) - 广东雨神_许华升.mp3" },
+    { id: "86", title: "0586.陪你到底_DJ打碟版.mp3", file: "0586.陪你到底_DJ打碟版.mp3" },
+    { id: "87", title: "0587.爱你十分泪_DJ打碟版.mp3", file: "0587.爱你十分泪_DJ打碟版.mp3" },
+    { id: "88", title: "0588.给你留言_DJ打碟版.mp3", file: "0588.给你留言_DJ打碟版.mp3" },
+    { id: "89", title: "0589.跟你走 (DJ小鱼儿版) - 半吨兄弟.mp3", file: "0589.跟你走 (DJ小鱼儿版) - 半吨兄弟.mp3" },
+    { id: "90", title: "0590.程佳佳-别错过.mp3", file: "0590.程佳佳-别错过.mp3" },
+    { id: "91", title: "0591.不修(DJR7版) - 房田立.mp3", file: "0591.不修(DJR7版) - 房田立.mp3" },
+    { id: "92", title: "0592.范倪Liu-南半球与北海道(DJ德朋版).mp3", file: "0592.范倪Liu-南半球与北海道(DJ德朋版).mp3" },
+    { id: "93", title: "0593.花僮-浪子闲话(DJ沈念版).mp3", file: "0593.花僮-浪子闲话(DJ沈念版).mp3" },
+    { id: "94", title: "0594.花僮-笑纳(DJ沈念版).mp3", file: "0594.花僮-笑纳(DJ沈念版).mp3" },
+    { id: "95", title: "0595.男儿当自强_DJ打碟版.mp3", file: "0595.男儿当自强_DJ打碟版.mp3" },
+    { id: "96", title: "0596.刀光剑影)_DJ打碟版.mp3", file: "0596.刀光剑影)_DJ打碟版.mp3" },
+    { id: "97", title: "0597.丑八怪_DJ打碟版.mp3", file: "0597.丑八怪_DJ打碟版.mp3" },
+    { id: "98", title: "0598.姚六一-雾里(DJ抖音火爆版).mp3", file: "0598.姚六一-雾里(DJ抖音火爆版).mp3" },
+    { id: "99", title: "0599.迈兮-红尘彼岸却无她(DJEva版).mp3", file: "0599.迈兮-红尘彼岸却无她(DJEva版).mp3" },
+
+];
+
+// 音乐播放器类
+class MusicPlayer {
+    constructor() {
+        this.audioPlayer = document.getElementById('mp3Player');
+        this.playlistContainer = document.getElementById('playlist');
+        this.currentSongDisplay = document.getElementById('curSong');
+        this.progressBar = document.getElementById('progress');
+        this.currentTimeDisplay = document.getElementById('currentTime');
+        this.totalTimeDisplay = document.getElementById('totalTime');
+        this.playBtn = document.getElementById('playBtn');
+        this.prevBtn = document.getElementById('prevBtn');
+        this.nextBtn = document.getElementById('nextBtn');
+        this.songCountDisplay = document.getElementById('songCount');
+        this.searchInput = document.getElementById('searchInput');
+        
+        // 播放器状态
+        this.currentSongIndex = 0;
+        this.songs = [];
+        this.filteredSongs = [];
+        this.isPlaying = false;
+        this.timerInterval = null;
+        
+        // 初始化
+        this.init();
+    }
+    
+    // 初始化播放器
+    init() {
+        this.loadSongs();
+        this.setupEventListeners();
+        this.updateSongCount();
+    }
+    
+    // 加载歌曲
+    loadSongs() {
+        this.songs = ALL_SONGS;
+        this.filteredSongs = [...this.songs];
+        this.renderPlaylist();
+    }
+    
+    // 渲染播放列表
+    renderPlaylist() {
+        this.playlistContainer.innerHTML = '';
+        
+        this.filteredSongs.forEach((song, index) => {
+            const songElement = document.createElement('div');
+            songElement.className = 'song-item';
+            
+            // 找到当前歌曲在原始列表中的索引
+            const originalIndex = this.songs.findIndex(s => s.id === song.id);
+            if (originalIndex === this.currentSongIndex) {
+                songElement.classList.add('active');
+            }
+            
+            songElement.innerHTML = `
+                <div class="song-number">${originalIndex + 1}</div>
+                <div class="song-title">${song.title}</div>
+            `;
+            
+            songElement.addEventListener('click', () => {
+                // 找到歌曲在原始列表中的索引并播放
+                const songIndex = this.songs.findIndex(s => s.id === song.id);
+                this.playSong(songIndex);
+            });
+            
+            this.playlistContainer.appendChild(songElement);
+        });
+    }
+    
+    // 设置事件监听器
+    setupEventListeners() {
+        // 播放/暂停按钮
+        this.playBtn.addEventListener('click', () => {
+            this.togglePlay();
+        });
+        
+        // 上一首按钮
+        this.prevBtn.addEventListener('click', () => {
+            this.playPrev();
+        });
+        
+        // 下一首按钮
+        this.nextBtn.addEventListener('click', () => {
+            this.playNext();
+        });
+        
+        // 音频时间更新事件
+        this.audioPlayer.addEventListener('timeupdate', () => {
+            this.updateProgress();
+        });
+        
+        // 音频加载完毕事件
+        this.audioPlayer.addEventListener('loadedmetadata', () => {
+            this.updateTotalTime();
+        });
+        
+        // 音频结束事件
+        this.audioPlayer.addEventListener('ended', () => {
+            this.playNext();
+        });
+        
+        // 进度条点击事件
+        this.progressBar.parentElement.addEventListener('click', (e) => {
+            const rect = this.progressBar.parentElement.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            this.seekTo(pos);
+        });
+        
+        // 搜索框输入事件
+        if (this.searchInput) {
+            this.searchInput.addEventListener('input', (e) => {
+                this.filterSongs(e.target.value);
+            });
+        }
+    }
+    
+    // 过滤歌曲
+    filterSongs(searchTerm) {
+        if (!searchTerm) {
+            this.filteredSongs = [...this.songs];
+        } else {
+            const term = searchTerm.toLowerCase();
+            this.filteredSongs = this.songs.filter(song => 
+                song.title.toLowerCase().includes(term)
+            );
+        }
+        this.renderPlaylist();
+    }
+    
+    // 播放指定索引的歌曲
+    playSong(index) {
+        if (index < 0 || index >= this.songs.length) return;
+        
+        this.currentSongIndex = index;
+        const song = this.songs[index];
+        
+        // 更新音频源
+        this.audioPlayer.src = song.file;
+        this.currentSongDisplay.textContent = `${index + 1}. ${song.title}`;
+        
+        // 更新播放列表中的激活状态
+        this.updateActiveSong();
+        
+        // 播放
+        this.audioPlayer.play();
+        this.isPlaying = true;
+        this.playBtn.innerHTML = '⏸';
+        
+        // 开始更新进度
+        this.startProgressTimer();
+    }
+    
+    // 切换播放/暂停状态
+    togglePlay() {
+        if (this.audioPlayer.src) {
+            if (this.isPlaying) {
+                this.audioPlayer.pause();
+                this.playBtn.innerHTML = '▶';
+                this.isPlaying = false;
+                this.stopProgressTimer();
+            } else {
+                this.audioPlayer.play();
+                this.playBtn.innerHTML = '⏸';
+                this.isPlaying = true;
+                this.startProgressTimer();
+            }
+        } else {
+            // 如果没有歌曲在播放，播放第一首
+            this.playSong(0);
+        }
+    }
+    
+    // 播放上一首
+    playPrev() {
+        let newIndex = this.currentSongIndex - 1;
+        if (newIndex < 0) newIndex = this.songs.length - 1;
+        this.playSong(newIndex);
+    }
+    
+    // 播放下一首
+    playNext() {
+        let newIndex = this.currentSongIndex + 1;
+        if (newIndex >= this.songs.length) newIndex = 0;
+        this.playSong(newIndex);
+    }
+    
+    // 更新进度条
+    updateProgress() {
+        if (this.audioPlayer.duration) {
+            const progress = (this.audioPlayer.currentTime / this.audioPlayer.duration) * 100;
+            this.progressBar.style.width = `${progress}%`;
+            
+            // 更新时间显示
+            this.currentTimeDisplay.textContent = this.formatTime(this.audioPlayer.currentTime);
+        }
+    }
+    
+    // 更新总时间
+    updateTotalTime() {
+        if (this.audioPlayer.duration) {
+            this.totalTimeDisplay.textContent = this.formatTime(this.audioPlayer.duration);
+        }
+    }
+    
+    // 跳转到指定位置
+    seekTo(position) {
+        if (this.audioPlayer.duration) {
+            this.audioPlayer.currentTime = position * this.audioPlayer.duration;
+        }
+    }
+    
+    // 开始进度计时器
+    startProgressTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
+        
+        this.timerInterval = setInterval(() => {
+            this.updateProgress();
+        }, 1000);
+    }
+    
+    // 停止进度计时器
+    stopProgressTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+    
+    // 更新播放列表中的激活歌曲
+    updateActiveSong() {
+        const songItems = document.querySelectorAll('.song-item');
+        songItems.forEach((item, index) => {
+            // 找到当前歌曲在过滤后列表中的索引
+            const songId = this.filteredSongs[index]?.id;
+            if (songId && this.songs[this.currentSongIndex]?.id === songId) {
+                item.classList.add('active');
+                // 滚动到可见区域
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+    
+    // 更新歌曲计数
+    updateSongCount() {
+        this.songCountDisplay.textContent = this.songs.length;
+    }
+    
+    // 格式化时间显示 (秒 -> 分:秒)
+    formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+}
+
+// 页面加载完成后初始化播放器
+document.addEventListener('DOMContentLoaded', () => {
+    const player = new MusicPlayer();
+    
+    // 将播放器实例暴露给全局，方便调试
+    window.musicPlayer = player;
+    
+    // 播放第一首歌曲
+    setTimeout(() => {
+        if (player.songs.length > 0) {
+            player.playSong(0);
+        }
+    }, 500);
+});
+</script>
+</body>	
+</html>
